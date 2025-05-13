@@ -2,7 +2,7 @@
 require "Config/session.php";
 require "Config/connect.php";
 if (isset($_COOKIE['user'])) {
-    header("Location: dashboard.php");
+    header("Location: user.php");
     exit();
 }
 
@@ -26,6 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
         if ($data=sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)) {
             setcookie("user",md5($data['user_id']),time() + (86400 * 30),"/");
             $_SESSION['name']=$data['name'];
+            $_SESSION['id']=md5($data['user_id']);
             header("Location: user.php");
             exit();
         }else{

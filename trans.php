@@ -5,113 +5,18 @@ if (!isset($_COOKIE['user'])) {
   header("Location: login2.0.php");
   exit();
 }
+
+$page_name="Transaction";
+require "Required/Header.php";
 ?>
-<!DOCTYPE html>
-<html lang="en">
 
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <link rel="apple-touch-icon" sizes="76x76" href="Plugin/assets/img/apple-icon.png">
-  <link rel="icon" type="image/png" href="Image/logo.png">
-  <title>
-    Belial
-  </title>
-  <!--     Fonts and icons     -->
-  <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Inter:300,400,500,600,700,900" />
-  <!-- Nucleo Icons -->
-  <link href="Plugin/assets/css/nucleo-icons.css" rel="stylesheet" />
-  <link href="Plugin/assets/css/nucleo-svg.css" rel="stylesheet" />
-  <!-- Font Awesome Icons -->
-  <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
-  <!-- Material Icons -->
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" />
-  <!-- CSS Files -->
-  <link id="pagestyle" href="Plugin/assets/css/material-dashboard.css?v=3.2.0" rel="stylesheet" />
-</head>
-
-<body class="g-sidenav-show dark-version bg-gray-600">
-  <aside class="sidenav navbar navbar-vertical active navbar-expand-xs border-radius-lg fixed-start ms-2 my-2 bg-transparent" data-class = "bg-transparent" id="sidenav-main">
-    <div class="sidenav-header">
-      <i class="fas fa-times p-3 cursor-pointer text-white opacity-5 position-absolute end-0 top-0 d-none d-xl-none" aria-hidden="true" id="iconSidenav"></i>
-      <a class="navbar-brand px-4 py-3 m-0" href=" https://demos.creative-tim.com/material-dashboard/pages/dashboard " target="_blank">
-        <img src="Image/logo.png" class="navbar-brand-img" width="26" height="26" alt="main_logo">
-        <span class="ms-1 text-sm text-white"><?php echo $_SESSION['name']?></span>
-      </a>
-    </div>
-    <hr class="horizontal dark mt-0 mb-2">
-    <div class="collapse navbar-collapse  w-auto " id="sidenav-collapse-main">
-      <ul class="navbar-nav">
-        <li class="nav-item">
-          <a class="nav-link text-white" href="user.php">
-            <i class="material-symbols-rounded opacity-5">group</i>
-            <span class="nav-link-text ms-1">Users</span>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link  text-white" href="cards.php">
-            <i class="material-symbols-rounded opacity-5">credit_card</i>
-            <span class="nav-link-text ms-1">Cards</span>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link active bg-gradient-dar text-white" href="trans.php">
-            <i class="material-symbols-rounded opacity-5">payments</i>
-            <span class="nav-link-text ms-1">Payments</span>
-          </a>
-        </li>
-      </ul>
-    </div>
-    <div class="sidenav-footer position-absolute w-100 bottom-0 ">
-      <div class="mx-3">
-        <a class="btn bg-gradient-dark w-100" href="logout.php" type="button">Logout</a>
-      </div>
-    </div>
-  </aside>
-  <main class="main-content position-relative max-height-vh-100 h-100 border-radius-lg ">
-    <!-- Navbar -->
-    <nav class="navbar navbar-main navbar-expand-lg px-0 mx-3 shadow-none border-radius-xl" id="navbarBlur" data-scroll="true">
-      <div class="container-fluid py-1 px-3">
-        <nav aria-label="breadcrumb">
-          <ol class="breadcrumb bg-transparent mb-0 pb-0 pt-1 px-0 me-sm-6 me-5">
-            <li class="breadcrumb-item text-sm"><a class="opacity-5 text-white" href="javascript:;">Pages</a></li>
-            <li class="breadcrumb-item text-sm text-white active" aria-current="page">Payments</li>
-          </ol>
-        </nav>
-        <div class="collapse navbar-collapse mt-sm-0 mt-2 me-md-0 me-sm-4" id="navbar">
-          <div class="ms-md-auto pe-md-3 d-flex align-items-center">
-            <div class="input-group input-group-outline">
-          
-            </div>
-          </div>
-          <ul class="navbar-nav d-flex align-items-center  justify-content-end">
-            
-            <li class="nav-item d-xl-none ps-3 d-flex align-items-center">
-              <a href="javascript:;" class="nav-link text-body p-0" id="iconNavbarSidenav">
-                <div class="sidenav-toggler-inner">
-                  <i class="sidenav-toggler-line"></i>
-                  <i class="sidenav-toggler-line"></i>
-                  <i class="sidenav-toggler-line"></i>
-                </div>
-              </a>
-            </li>
-            
-            
-            <li class="nav-item d-flex align-items-center">
-              
-            </li>
-          </ul>
-        </div>
-      </div>
-    </nav>
-    <!-- End Navbar -->
     <div class="container-fluid py-2">
       <div class="row">
         <div class="col-12">
           <div class="card my-4">
             <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
               <div class="bg-gradient-dark shadow-dark border-radius-lg pt-4 pb-3">
-                <h6 class="text-white text-capitalize ps-3">Payments List</h6>
+                <h6 class="text-white text-capitalize ps-3">Transactions List</h6>
               </div>
             </div>
             <div class="card-body px-0 pb-2">
@@ -182,11 +87,11 @@ if (!isset($_COOKIE['user'])) {
                       <td class="align-middle text-center text-sm">
                         <?php
                           if($data['transaction_status'] == 'success'){
-                            echo '<span class="badge badge-sm bg-gradient-success">Online</span>';
+                            echo '<span class="badge badge-sm bg-gradient-success data-id="'.$data['transaction_id'].'" data-name="success"">Success</span>';
                           }else if($data['transaction_status'] == 'failed'){
-                            echo '<span class="badge badge-sm bg-gradient-danger">failed</span>';
+                            echo '<span class="badge badge-sm change bg-gradient-danger" data-id="'.$data['transaction_id'].'" data-name="failed">failed</span>';
                           }else if($data['transaction_status'] == 'pending'){
-                            echo '<span class="badge badge-sm bg-gradient-warning">pending</span>';
+                            echo '<span class="badge badge-sm change bg-gradient-warning" data-id="'.$data['transaction_id'].'" data-name="pending" >pending</span>';
                           }
                         ?>
                         
@@ -208,293 +113,74 @@ if (!isset($_COOKIE['user'])) {
         </div>
       </div>
     
-      <footer class="footer py-4  ">
-        <div class="container-fluid">
-          <div class="row align-items-center justify-content-lg-between">
-            <div class="col-lg-6 mb-lg-0 mb-4">
-              <div class="copyright text-center text-sm text-muted text-lg-start">
-                © <script>
-                  document.write(new Date().getFullYear())
-                </script>,
-                made with <i class="fa fa-heart"></i> by
-                <a href="https://www.creative-tim.com" class="font-weight-bold" target="_blank">Creative Tim</a>
-                for a better web.
-              </div>
-            </div>
-            <div class="col-lg-6">
-              <ul class="nav nav-footer justify-content-center justify-content-lg-end">
-                <li class="nav-item">
-                  <a href="https://www.creative-tim.com" class="nav-link text-muted" target="_blank">Creative Tim</a>
-                </li>
-                <li class="nav-item">
-                  <a href="https://www.creative-tim.com/presentation" class="nav-link text-muted" target="_blank">About Us</a>
-                </li>
-                <li class="nav-item">
-                  <a href="https://www.creative-tim.com/blog" class="nav-link text-muted" target="_blank">Blog</a>
-                </li>
-                <li class="nav-item">
-                  <a href="https://www.creative-tim.com/license" class="nav-link pe-0 text-muted" target="_blank">License</a>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </footer>
+    
     </div>
-  </main>
+ 
+<?php
 
-  <!--   Core JS Files   -->
-  <script src="Plugin/assets/js/core/popper.min.js"></script>
-  <script src="Plugin/assets/js/core/bootstrap.min.js"></script>
-  <script src="Plugin/assets/js/plugins/perfect-scrollbar.min.js"></script>
-  <script src="Plugin/assets/js/plugins/smooth-scrollbar.min.js"></script>
-  <script src="Plugin/assets/js/plugins/chartjs.min.js"></script>
-  <script>
-    var ctx = document.getElementById("chart-bars").getContext("2d");
+$script = <<<EOF
+ $(document).on('dblclick', '.change', function() {
+ var dataName = $(this).data('name');
+ var dataId = $(this).data('id'); 
+ var select = $('<select class="badge badge-sm select change text-bg-dark" data-id="' + dataId + '" data-name="'+dataName+'">')
+                  .append('<option value="success">Success</option>')
+                  .append('<option value="failed">Failed</option>')
+                  .append('<option value="pending">Pending</option>');
+                  if (dataName === 'pending') {
+            select.addClass('bg-gradient-warning');  // Set bg-gradient-warning if the default is 'pending'
+        } else if (dataName === 'success') {
+            select.addClass('bg-gradient-success');  // Set bg-gradient-success if the default is 'success'
+        } else if (dataName === 'failed') {
+            select.addClass('bg-gradient-danger');  // Set bg-gradient-danger if the default is 'failed'
+        }
 
-    new Chart(ctx, {
-      type: "bar",
-      data: {
-        labels: ["M", "T", "W", "T", "F", "S", "S"],
-        datasets: [{
-          label: "Views",
-          tension: 0.4,
-          borderWidth: 0,
-          borderRadius: 4,
-          borderSkipped: false,
-          backgroundColor: "#43A047",
-          data: [50, 45, 22, 28, 50, 60, 76],
-          barThickness: 'flex'
-        }, ],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            display: false,
+  $(this).replaceWith(select);
+  if (dataName) {
+    select.val(dataName); // Set the value of the select dropdown to match data-name
+  }
+  select.focus();
+});
+function sendDataToApi(data) {
+}
+$(document).on('blur', '.select', function() {
+        var element=$(this);
+        var selectedValue = $(this).val(); // Get the selected value from the select dropdown
+        var dataId = $(this).data('id'); 
+        var dataName=$(this).data('name');
+        var newSpan;
+        var oldSpan =$('<span class="badge badge-sm ' + $(this).attr('class') + '" data-id="'+ dataId +'" data-name="'+ selectedValue +'">' + selectedValue.charAt(0).toUpperCase() + selectedValue.slice(1) + '</span>');
+        
+        if (selectedValue === dataName) {     
+            $(this).replaceWith(oldSpan);
+            return;
+        }
+
+        // Create a new span element based on the selected value
+        if (selectedValue === 'success') {
+            newSpan = $('<span class="badge badge-sm bg-gradient-success" data-id="'+dataId+'" data-name="success">Success</span>');
+        } else if (selectedValue === 'failed') {
+            newSpan = $('<span class="badge badge-sm change bg-gradient-danger" data-id="'+dataId+'" data-name="failed">Failed</span>');
+        } else if (selectedValue === 'pending') {
+            newSpan = $('<span class="badge badge-sm change bg-gradient-warning" data-id="'+dataId+'" data-name="pending">Pending</span>');
+        }
+        var fd = new FormData();
+        fd.append('id',dataId);
+        fd.append('status',selectedValue);
+
+        $.ajax({
+          url:      'API/changeStatus.php',
+          type:     'POST',
+          dataType: 'json',
+          data:     fd,
+          processData: false,
+          contentType: false,
+          success: function(responce){
+             element.replaceWith(newSpan);
+          },
+          error: function(responce){
+             element.replaceWith(oldSpan);
           }
-        },
-        interaction: {
-          intersect: false,
-          mode: 'index',
-        },
-        scales: {
-          y: {
-            grid: {
-              drawBorder: false,
-              display: true,
-              drawOnChartArea: true,
-              drawTicks: false,
-              borderDash: [5, 5],
-              color: '#e5e5e5'
-            },
-            ticks: {
-              suggestedMin: 0,
-              suggestedMax: 500,
-              beginAtZero: true,
-              padding: 10,
-              font: {
-                size: 14,
-                lineHeight: 2
-              },
-              color: "#737373"
-            },
-          },
-          x: {
-            grid: {
-              drawBorder: false,
-              display: false,
-              drawOnChartArea: false,
-              drawTicks: false,
-              borderDash: [5, 5]
-            },
-            ticks: {
-              display: true,
-              color: '#737373',
-              padding: 10,
-              font: {
-                size: 14,
-                lineHeight: 2
-              },
-            }
-          },
-        },
-      },
-    });
-
-
-    var ctx2 = document.getElementById("chart-line").getContext("2d");
-
-    new Chart(ctx2, {
-      type: "line",
-      data: {
-        labels: ["J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"],
-        datasets: [{
-          label: "Sales",
-          tension: 0,
-          borderWidth: 2,
-          pointRadius: 3,
-          pointBackgroundColor: "#43A047",
-          pointBorderColor: "transparent",
-          borderColor: "#43A047",
-          backgroundColor: "transparent",
-          fill: true,
-          data: [120, 230, 130, 440, 250, 360, 270, 180, 90, 300, 310, 220],
-          maxBarThickness: 6
-
-        }],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            display: false,
-          },
-          tooltip: {
-            callbacks: {
-              title: function(context) {
-                const fullMonths = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-                return fullMonths[context[0].dataIndex];
-              }
-            }
-          }
-        },
-        interaction: {
-          intersect: false,
-          mode: 'index',
-        },
-        scales: {
-          y: {
-            grid: {
-              drawBorder: false,
-              display: true,
-              drawOnChartArea: true,
-              drawTicks: false,
-              borderDash: [4, 4],
-              color: '#e5e5e5'
-            },
-            ticks: {
-              display: true,
-              color: '#737373',
-              padding: 10,
-              font: {
-                size: 12,
-                lineHeight: 2
-              },
-            }
-          },
-          x: {
-            grid: {
-              drawBorder: false,
-              display: false,
-              drawOnChartArea: false,
-              drawTicks: false,
-              borderDash: [5, 5]
-            },
-            ticks: {
-              display: true,
-              color: '#737373',
-              padding: 10,
-              font: {
-                size: 12,
-                lineHeight: 2
-              },
-            }
-          },
-        },
-      },
-    });
-
-    var ctx3 = document.getElementById("chart-line-tasks").getContext("2d");
-
-    new Chart(ctx3, {
-      type: "line",
-      data: {
-        labels: ["Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
-        datasets: [{
-          label: "Tasks",
-          tension: 0,
-          borderWidth: 2,
-          pointRadius: 3,
-          pointBackgroundColor: "#43A047",
-          pointBorderColor: "transparent",
-          borderColor: "#43A047",
-          backgroundColor: "transparent",
-          fill: true,
-          data: [50, 40, 300, 220, 500, 250, 400, 230, 500],
-          maxBarThickness: 6
-
-        }],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-        egend: {
-            display: false,
-          }
-        },
-        interaction: {
-          intersect: false,
-          mode: 'index',
-        },
-        scales: {
-          y: {
-            grid: {
-              drawBorder: false,
-              display: true,
-              drawOnChartArea: true,
-              drawTicks: false,
-              borderDash: [4, 4],
-              color: '#e5e5e5'
-            },
-            ticks: {
-              display: true,
-              padding: 10,
-              color: '#737373',
-              font: {
-                size: 14,
-                lineHeight: 2
-              },
-            }
-          },
-          x: {
-            grid: {
-              drawBorder: false,
-              display: false,
-              drawOnChartArea: false,
-              drawTicks: false,
-              borderDash: [4, 4]
-            },
-            ticks: {
-              display: true,
-              color: '#737373',
-              padding: 10,
-              font: {
-                size: 14,
-                lineHeight: 2
-              },
-            }
-          },
-        },
-      },
-    });
-  </script>
-  <script>
-    var win = navigator.platform.indexOf('Win') > -1;
-    if (win && document.querySelector('#sidenav-scrollbar')) {
-      var options = {
-        damping: '0.5'
-      }
-      Scrollbar.init(document.querySelector('#sidenav-scrollbar'), options);
-    }
-  </script>
-  <!-- Github buttons -->
-  <script async defer src="https://buttons.github.io/buttons.js"></script>
-  <!-- Control Center for Material Dashboard: parallax effects, scripts for the example pages etc -->
-  <script src="Plugin/assets/js/material-dashboard.min.js?v=3.2.0"></script>
-</body>
-
-</html>
+        });
+});
+EOF;
+require "Required/Footer.php";
