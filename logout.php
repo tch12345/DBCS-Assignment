@@ -1,9 +1,9 @@
 <?php
-setcookie("user", "", time() - 3600, "/");
+setcookie("customer_user", "", time() - 3600, "/");
 
 session_start();
 session_unset();
 session_destroy();
 
-header("Location: login2.0.php");
+header("Location: index.php");
 exit;
