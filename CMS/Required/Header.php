@@ -35,6 +35,12 @@
     <div class="collapse navbar-collapse  w-auto " id="sidenav-collapse-main">
       <ul class="navbar-nav">
         <li class="nav-item">
+          <a class="nav-link <?php echo ($page_name=="Dashboard"?"active bg-gradient-dark":"")?> text-white" href="dashboard.php">
+            <i class="material-symbols-rounded opacity-5">dashboard</i>
+            <span class="nav-link-text ms-1">Dashboard</span>
+          </a>
+        </li>
+        <li class="nav-item">
           <a class="nav-link <?php echo ($page_name=="Users"?"active bg-gradient-dark":"")?> text-white" href="user.php">
             <i class="material-symbols-rounded opacity-5">group</i>
             <span class="nav-link-text ms-1">Users</span>
@@ -48,10 +54,30 @@
         </li>
         <li class="nav-item">
           <a class="nav-link <?php echo ($page_name=="Transaction"?"active bg-gradient-dark":"")?> text-white" href="trans.php">
-            <i class="material-symbols-rounded opacity-5">payments</i>
+            <i class="material-symbols-rounded opacity-5">receipt_long</i>
             <span class="nav-link-text ms-1">Transactions</span>
           </a>
         </li>
+        <li class="nav-item">
+          <a class="nav-link <?php echo ($page_name=="Payment"?"active bg-gradient-dark":"")?> text-white" href="payment.php">
+            <i class="material-symbols-rounded opacity-5">payments</i>
+            <span class="nav-link-text ms-1">Payments</span>
+          </a>
+        </li>
+        <?php 
+        if($_SESSION['id']==md5(1)){
+          ?>
+         <li class="nav-item">
+          <a class="nav-link <?php echo ($page_name=="Logs"?"active bg-gradient-dark":"")?> text-white" href="activity_logs.php">
+            <i class="material-symbols-rounded opacity-5">description</i>
+            <span class="nav-link-text ms-1">Activity Logs</span>
+          </a>
+        </li>
+
+          <?php
+        }
+        
+        ?>
       </ul>
     </div>
     <div class="sidenav-footer position-absolute w-100 bottom-0 ">

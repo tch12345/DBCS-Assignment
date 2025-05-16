@@ -1,6 +1,7 @@
 <?php
 require "Config/session.php";
 require "Config/connect.php";
+include 'logs.php';
 if (isset($_SESSION['name'])) {
     header("Location: user.php");
     exit();
@@ -27,12 +28,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
             setcookie("user",md5($data['user_id']),time() + (86400 * 30),"/");
             $_SESSION['name']=$data['name'];
             $_SESSION['id']=md5($data['user_id']);
-            header("Location: user.php");
+            logSuccessLogin($conn, $username);
+            header("Location: dashboard.php");
             exit();
         }else{
-            ?>
-            <script>alert("test")</script>
-            <?php
+            logFailedLogin($conn,$username);
         }
     }
    

@@ -13,7 +13,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $password = $_POST['password'];
     $phone = $_POST['phone'];
     $role = $_POST['role'];
-
+    if($role == 'admin'){
+      if($_SESSION['id']!=md5(1)){
+        $role == 'user';
+      }
+    }
     
     // Check if email already exists
     $query = "SELECT 1 FROM users WHERE email = ?";
@@ -77,7 +81,12 @@ require "Required/Header.php";
                   <select class="form-select border border-secondary px-3" name="role" required id="role">
                     <option value="">Select role</option>
                     <option value="user">User</option>
-                    <option value="admin">Admin</option>
+                    <option value="finance">Finance</option>
+                    <?php 
+                     if($_SESSION['id']==md5(1)){
+                      echo  '<option value="admin">Admin</option>';
+                    }
+                    ?>
                   </select>
                 </div>
                 <div class="d-flex  justify-content-end px-3 pt-2 ">

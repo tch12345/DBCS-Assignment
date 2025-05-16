@@ -37,11 +37,9 @@ require "Required/Header.php";
                     <?php
                     $query = "SELECT 
                         t.*,
-                        c.card_brand,
                         u.name,
                         u.email
                     FROM transactions t
-                    JOIN cards c ON t.card_id = c.card_id
                     JOIN users u ON t.user_id = u.user_id;";
                     $stmt = sqlsrv_query($conn, $query);
                     if($stmt){
@@ -61,7 +59,7 @@ require "Required/Header.php";
                       <td class="align-middle text-center text-sm">
                         <div class="d-flex px-2 py-1">
                           <div class="d-flex flex-column justify-content-center">
-                            <h6 class="mb-0 text-sm"><?php echo $data['card_brand'];?></h6>
+                            <h6 class="mb-0 text-sm"><?php echo $data['payment_method'];?></h6>
                           </div>
                         </div>
                       </td>
