@@ -79,8 +79,15 @@ require "Required/header.php";
           </p>
 
           <div class="d-flex justify-content-start gap-3">
-            <!----<a href="#" class="btn btn-outline-dark text-uppercase">Get Support</a>-->
-            <a href="#" class="btn btn-dark text-uppercase add-to-cart" data-product-name="<?php echo $name;?>">Add to Cart</a>
+            
+            <?php
+            if(isset($_SESSION['customer_id'])){
+              echo '<a href="#" class="btn btn-dark text-uppercase add-to-cart" data-product-name="'.$name.'">Add to Cart</a>';
+            }else{
+              echo '<a href="login.php" class="btn btn-outline-dark text-uppercase" disabled >Need to Login First</a>';
+            }
+             ?>
+            
           </div>
         </div>
       </div>

@@ -151,11 +151,16 @@
                         </a>
                       </li>
                       <li>
-                        <a href="cart.php">
+                        <?php 
+                        if(isset($_SESSION['customer_id'])){
+                          echo '<a href="cart.php">
                           <svg class="cart">
                             <use xlink:href="#cart"></use>
                           </svg>
-                        </a>
+                        </a>';
+                        };
+                        ?>
+                        
                       </li>
                     </ul>
                   </div>

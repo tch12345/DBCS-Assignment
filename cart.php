@@ -2,6 +2,10 @@
 require "Config/connect.php";
 require "Config/session.php";
 
+if(!isset($_SESSION['customer_id']) || !isset($_SESSION['customer_name'])){
+    header("Location: index.php");
+    exit();
+}
 $sql = "SELECT DISTINCT 
     p.name,
 	c.quantity,

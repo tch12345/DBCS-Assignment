@@ -1,14 +1,139 @@
 <?php
 require "Config/connect.php";
 require "Config/session.php";
+$script="";
+function getCardBrand($cardNumber) {
+    // 移除空格和非数字字符
+    $cardNumber = preg_replace('/\D/', '', $cardNumber);
 
-require "Required/header.php";
+    if (preg_match('/^4[0-9]{12}(?:[0-9]{3})?$/', $cardNumber)) {
+        return 'Visa';
+    } elseif (preg_match('/^5[1-5][0-9]{14}$/', $cardNumber) ||
+              preg_match('/^2(2[2-9][0-9]{2}|[3-6][0-9]{3}|7[01][0-9]{2}|720[0-9]{2})[0-9]{10}$/', $cardNumber)) {
+        return 'MasterCard';
+    } elseif (preg_match('/^3[47][0-9]{13}$/', $cardNumber)) {
+        return 'American Express';
+    } elseif (preg_match('/^6(?:011|5[0-9]{2}|4[4-9][0-9])[0-9]{12}$/', $cardNumber)) {
+        return 'Discover';
+    } elseif (preg_match('/^3(?:0[0-5]|[68][0-9])[0-9]{11}$/', $cardNumber)) {
+        return 'Diners Club';
+    } elseif (preg_match('/^(?:2131|1800|35\d{3})\d{11}$/', $cardNumber)) {
+        return 'JCB';
+    } else {
+        return 'Unknown';
+    }
+}
 
 if($_SERVER['REQUEST_METHOD']=='POST' && isset($_POST['submit'])){
 
+    $sql = "SELECT user_id FROM users WHERE CONVERT(VARCHAR(32), HASHBYTES('MD5', CAST(user_id AS VARCHAR)),2) = ?";
+    $params = [$_SESSION['customer_id']];
+    $stmt = sqlsrv_prepare($conn, $sql, $params);
+    sqlsrv_execute($stmt);
+    if($data = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)){
+      $user_id=$data['user_id'];
+    }
+    // get user id ady
     $cards=$_POST['card_number'];
-    $sql="Select * from cards where card_number = ?";
-    $param=array();
+    $sql="select * from cards where card_number = ? and valid = 1 and user_id = ? ";
+    $params=array(
+       $cards,
+       $user_id
+    );
+   
+    $stmt = sqlsrv_query($conn, $sql, $params);
+    if(sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)){
+      #got card ignore direct do payment
+
+    }else{
+      # no card
+      //process date
+      $updatecard="update cards set valid=0 where user_id=".$user_id;
+      sqlsrv_query($conn,  $updatecard);
+      
+      list($month, $year) = explode('/', $_POST['expiry_date']);
+      $year = '20' . $year; 
+      $expirationDate = "$year-$month-01";
+      $date = DateTime::createFromFormat('Y-m-d', $expirationDate);
+      $lastDay = $date->format('Y-m-t');
+
+      $parts = array_map('trim', explode(',', $_POST['address']));
+      if (count($parts) === 5) {
+          $address_array = [
+              "address_line1" => $parts[0],
+              "city" => $parts[1],
+              "state" => $parts[2],
+              "postal_code" => $parts[3],
+              "country" => $parts[4],
+          ];
+
+        }
+      $json_string = json_encode($address_array, JSON_UNESCAPED_UNICODE);
+    
+
+      $insertsql="INSERT INTO cards (user_id, card_number, card_brand, expiration_date, billing_address,created_at) VALUES (?, ?, ?, ?, ?,GETDATE())";
+      $param=array(
+        $user_id,
+        $cards,
+        getCardBrand($cards),
+        $lastDay,
+        $json_string
+      );
+      $stmt = sqlsrv_query($conn, $insertsql, $param);
+    }
+    // make payment here got card ady
+    $selectCart = "SELECT product_name, quantity FROM cart WHERE user_id = ? and deleted_at is null";
+    $cartStmt = sqlsrv_query($conn, $selectCart, array($_SESSION['customer_id']));
+    $items = [];
+    $prices = [];
+    $quantities = [];
+    $total_price = 0;
+    while ($row = sqlsrv_fetch_array($cartStmt, SQLSRV_FETCH_ASSOC)) {
+        $product_name = $row['product_name'];
+        $quantity = intval($row['quantity']);
+        $priceQuery = "SELECT max(price) as price FROM products WHERE name = ? group by name ";
+        $priceStmt = sqlsrv_query($conn, $priceQuery, array($product_name));
+        $priceRow = sqlsrv_fetch_array($priceStmt, SQLSRV_FETCH_ASSOC);
+        $price = floatval($priceRow['price']);
+        $items[] = $product_name;
+        $prices[] = $price;
+        $quantities[] = $quantity;
+        $total_price += $price * $quantity;
+    }
+    if (!empty($items)){
+      $insertPayment = "INSERT INTO payment (user_id_md5, items, prices, quantities, total_price, created_at)
+                      VALUES (?, ?, ?, ?, ?, GETDATE())";
+      $params = array(
+        $_SESSION['customer_id'],
+        json_encode($items, JSON_UNESCAPED_UNICODE),
+        json_encode($prices),
+        json_encode($quantities),
+        $total_price
+      );
+      $insertStmt = sqlsrv_query($conn, $insertPayment, $params);
+      $deleteCart = "DELETE FROM cart WHERE user_id = ? AND deleted_at IS NULL";
+      $deleteStmt = sqlsrv_query($conn, $deleteCart,array($_SESSION['customer_id']));
+      
+      $insertSql = "INSERT INTO transactions (
+        user_id, amount, transaction_date, 
+        transaction_status, payment_method, transaction_reference, created_at
+      ) VALUES (?, ?, GETDATE(), ?, ?, ?, GETDATE())";
+      $params = [
+        $user_id,
+        $total_price,
+        "success",
+        "credit_card",
+        "txn_". round(microtime(true) * 1000),
+      ];
+  
+      $stmt = sqlsrv_query($conn, $insertSql, $params);
+      $script.="Swal.fire('Payment Successful', 'success').then(() => {
+                    window.location.href = 'profile.php';
+                });";
+    }
+
+
+   
 }
 $sql = "SELECT DISTINCT 
     p.name,
@@ -28,7 +153,7 @@ while ($row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)) {
 }
 $sql = "SELECT c.*,u.name, u.email ,u.phone FROM cards c
 LEFT JOIN users u ON c.user_id = u.user_id
- WHERE CONVERT(VARCHAR(32), HASHBYTES('MD5', CAST(c.user_id AS VARCHAR)), 2) = ?";
+ WHERE CONVERT(VARCHAR(32), HASHBYTES('MD5', CAST(c.user_id AS VARCHAR)), 2) = ? and valid=1";
 
 $params = [ $_SESSION['customer_id']];
 $card = null;
@@ -49,6 +174,7 @@ if($card){
 
 
 }
+require "Required/header.php";
 
 ?>
 <section id="payment" class="position-relative padding-large overflow-hidden">

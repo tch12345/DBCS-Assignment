@@ -99,53 +99,63 @@ require "Required/header.php";
             </div>
             <div class="text-muted">
               <ul class="list-unstyled">
-                <!-- Purchase 1 -->
-                <li class="d-flex align-items-center py-3 border-bottom">
-                  <img src="images/product-item1.jpg" alt="product" style="width: 80px; height: 80px; object-fit: cover;" class="me-3 rounded">
-                  <div class="me-3">
-                    <h6 class="mb-1 text-uppercase" style="font-size: 1.1rem;">Product 1</h6>
-                    <small class="text-muted">Model: IP10X</small><br>
-                    <small class="text-muted">SN: 12345AB67890</small><br>
-                    <small class="text-muted">Warranty: Until January 2026</small>
-                  </div>
-                  <div class="ms-auto">
-                    <button class="btn btn-outline-primary btn-sm">Get Support</button>
-                  </div>
-                </li>
-                <!-- Purchase 2 -->
-                <li class="d-flex align-items-center py-3 border-bottom">
-                  <img src="images/product-item2.jpg" alt="product" style="width: 80px; height: 80px; object-fit: cover;" class="me-3 rounded">
-                  <div class="me-3">
-                    <h6 class="mb-1 text-uppercase" style="font-size: 1.1rem;">Product 2</h6>
-                    <small class="text-muted">Model: XY9</small><br>
-                    <small class="text-muted">SN: 54321DC43210</small><br>
-                    <small class="text-muted">Warranty: Until December 2025</small>
-                  </div>
-                  <div class="ms-auto">
-                    <button class="btn btn-outline-primary btn-sm">Get Support</button>
-                  </div>
-                </li>
-                <!-- Purchase 3 -->
-                <li class="d-flex align-items-center py-3">
-                  <img src="images/product-item3.jpg" alt="product" style="width: 80px; height: 80px; object-fit: cover;" class="me-3 rounded">
-                  <div class="me-3">
-                    <h6 class="mb-1 text-uppercase" style="font-size: 1.1rem;">Product 3</h6>
-                    <small class="text-muted">Model: QZ202</small><br>
-                    <small class="text-muted">SN: 98765GF12321</small><br>
-                    <small class="text-muted">Warranty: Until November 2026</small>
-                  </div>
-                  <div class="ms-auto">
-                    <button class="btn btn-outline-primary btn-sm">Get Support</button>
-                  </div>
-                </li>
+
+              <?php 
+              $sql="select * from payment where user_id_md5 = ?";
+              $params=[$_SESSION['customer_id']];
+              $stmt= sqlsrv_query($conn,$sql,$params);
+              if($stmt){
+                
+                while($row=sqlsrv_fetch_array($stmt,SQLSRV_FETCH_ASSOC)){
+                    $i=0;
+                    
+                    $phones = json_decode($row['items'],true);
+                    
+                    $placeholders = rtrim(str_repeat('?,', count($phones)), ',');
+                    $quantity=json_decode($row['quantities'],true);
+                    $PhoneSql="SELECT  max(image_url) as images
+                                      ,MAX(product_id)
+                                      ,max(price) as price
+                                      ,max(model) as model
+                                      ,max(Warranty)
+                                      ,name 
+                                      FROM products where name in ($placeholders) group by name;";
+                    $param=$phones;
+                   echo '<div class="border-bottom">';
+                    if($phonestmt=sqlsrv_query($conn,$PhoneSql,$param)){
+                      
+                      while($Phonerow=sqlsrv_fetch_array($phonestmt,SQLSRV_FETCH_ASSOC)){
+                        
+                        ?>
+                            <li class="d-flex align-items-center py-3">
+                              <img src="<?php echo $Phonerow['images']?>" alt="product" style="width: 80px; height: 80px; object-fit: cover;" class="me-3 rounded">
+                              <div class="me-3">
+                                <h6 class="mb-1 text-uppercase" style="font-size: 1.1rem;"><?php echo $Phonerow['name'];?></h6>
+                                <small class="text-muted">Model: <?php echo $Phonerow['model']?></small><br>
+                                <small class="text-muted">Quantity: <?php echo $quantity[$i]?></small><br>
+                                <small class="text-muted">Price: RM <?php echo $Phonerow['price']?></small><br>
+                                <small class="text-muted">Warranty: Until November 2026</small>
+                              </div>
+                              <div class="ms-auto">
+                                <button class="btn btn-outline-primary btn-sm">Get Support</button>
+                              </div>
+                            </li>
+                  <?php
+                        $i+=1;
+                      }
+                    }
+                     echo '</div>';
+                  
+                  
+                }
+              }
+              ?>
+
+
               </ul>
             </div>
           </div>
-           <div id="pagination-controls" class="d-flex justify-content-center mt-3">
-              <button id="prev-page-btn" class="btn btn-dark text-uppercase" disabled>Prev</button>
-              <span id="page-number" class="mx-3">1/2</span>
-              <button id="next-page-btn" class="btn btn-dark text-uppercase">Next</button>
-            </div>
+          
              <div id="pagination-controls" class="d-flex justify-content-center mt-3">
               <a id="logout" href="logout.php" class="btn btn-danger text-uppercase shadow-none m-4 px-4" >Log out</a>
               
