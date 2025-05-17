@@ -60,9 +60,9 @@ This project is a **User Management System** designed to demonstrate secure hand
 - Passwords are stored in plain text for demo purposes – replace with proper hashing (e.g., `password_hash()`) in production.
 
 ## Author
-- **[Your Name Here]**
-- Student ID: *[Insert your student ID]*
-- University: *[Insert University/Institution Name]*
+- **tan**
+- Student ID: *-*
+- University: *-*
 
 ## License
 This project is for **academic use only** under CCS6344 course requirements.
