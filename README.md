@@ -38,9 +38,7 @@ This project is a **User Management System** designed to demonstrate secure hand
 | phone       | VARCHAR(20)      | User's contact number              |
 | created_at  | DATETIME         | Account creation timestamp         |
 | deleted_at  | DATETIME (NULL)  | Deletion timestamp (if soft-deleted) |
-| status      | INT              | Account status (0 = active, 1 = inactive) |
 | role        | VARCHAR(20)      | User role (admin, user, finance)   |
-| username    | VARCHAR(50)      | Optional username field            |
 
 ## Setup Instructions
 1. **Import Database:**
