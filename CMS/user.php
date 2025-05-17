@@ -34,6 +34,7 @@ require "Required/Header.php";
                       <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Phone</th>
                       <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Last Login</th>
                       <?php echo '<th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Role</th>'; ?>
+                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -82,7 +83,14 @@ require "Required/Header.php";
                         <?php
                       }
                       ?>
-                      
+                      <td class="align-middle text-center">
+                        <a href="adminEdit.php?user_id=<?php echo $data['user_id']; ?>" class="btn btn-sm btn-warning me-1">Edit</a>
+                       <a href="#" 
+                          class="btn btn-sm btn-danger delete-user" 
+                          data-user-id="<?php echo $data['user_id']; ?>">
+                          Delete
+                        </a>
+                      </td>
                     </tr>
                     <?php
                       }
@@ -100,4 +108,26 @@ require "Required/Header.php";
       </div>
     </div>
 <?php
+$script = <<<EOF
+ $('.delete-user').click(function (e) {
+        e.preventDefault(); // prevent default action
+
+        var userId = $(this).data('user-id');
+
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to undo this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Redirect to the delete URL
+                window.location.href = 'adminDelete.php?user_id=' + userId;
+            }
+        });
+    });
+EOF;
 require "Required/Footer.php";
