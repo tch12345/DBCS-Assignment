@@ -50,7 +50,7 @@ require "Required/header.php";
             $sql_card= "SELECT 
                           billing_address,
                           card_brand,
-                          RIGHT(CONVERT(VARCHAR(50), DecryptByCert(Cert_ID('DataEncryptionCert'), card_number_encrypted)), 4) AS last4digits
+                          RIGHT(CONVERT(NVARCHAR(50), DecryptByCert(Cert_ID('DataEncryptionCert'), card_number_encrypted)), 4) AS last4digits
                       FROM cards
                       WHERE CONVERT(VARCHAR(32), HASHBYTES('MD5', CAST(user_id AS VARCHAR)), 2) = ? and valid=1;";
               $array=array(

@@ -93,7 +93,7 @@ if($_SERVER['REQUEST_METHOD']=='POST' && isset($_POST['submit'])){
                 )
                 VALUES (
                     ?, 
-                    EncryptByCert(Cert_ID('DataEncryptionCert'),'".$cards."'), 
+                    EncryptByCert(Cert_ID('DataEncryptionCert'),?), 
                     ?, 
                     ?, 
                     ?, 
@@ -103,6 +103,7 @@ if($_SERVER['REQUEST_METHOD']=='POST' && isset($_POST['submit'])){
        
       $param=[
         $user_id,
+        $cards,
         getCardBrand($cards),
         $lastDay,
         $json_string
@@ -182,7 +183,7 @@ $total=0;
 while ($row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)) {
                 $total+=$row['price']*$row['quantity'];
 }
-$sql = "SELECT c.*,u.name, u.email ,u.phone,CONVERT(VARCHAR(50), DecryptByCert(Cert_ID('DataEncryptionCert'), c.card_number_encrypted)) AS decrypted_card_number FROM cards c
+$sql = "SELECT c.*,u.name, u.email ,u.phone,CONVERT(NVARCHAR(50), DecryptByCert(Cert_ID('DataEncryptionCert'), c.card_number_encrypted)) AS decrypted_card_number FROM cards c
 LEFT JOIN users u ON c.user_id = u.user_id
  WHERE CONVERT(VARCHAR(32), HASHBYTES('MD5', CAST(c.user_id AS VARCHAR)), 2) = ? and valid=1";
 
