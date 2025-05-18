@@ -1,0 +1,123 @@
+--CREATE USER
+GO
+CREATE LOGIN [admin] WITH PASSWORD = 'Pa$$W0rd';
+GO
+CREATE LOGIN users_php WITH PASSWORD = 'Pa$$w0rd';
+GO
+USE dbcs;
+GO
+CREATE USER users_php FOR LOGIN users_php;
+GO
+CREATE USER [admin] FOR LOGIN [admin];
+GO
+ALTER ROLE db_owner ADD MEMBER [admin];
+REVERT;
+
+--RLS IMPLEMENT
+GO
+CREATE SCHEMA Security;
+
+-- TO LIMIT user_php only
+GO
+CREATE FUNCTION Security.fn_rls_filter(@Role NVARCHAR(50))
+RETURNS TABLE
+WITH SCHEMABINDING
+AS
+RETURN 
+    SELECT 1 AS fn_accessResult
+    WHERE USER_NAME() <> 'users_php' OR @Role = 'user';
+
+--ACTIVE THE RLS
+GO
+CREATE SECURITY POLICY Security.Policy_FilterUsers
+ADD FILTER PREDICATE Security.fn_rls_filter(Role)
+ON dbo.Users
+WITH (STATE = ON);
+GO
+
+--Constraint INSERT FOR user_php 
+CREATE TRIGGER trg_LimitInsertRoleForSetup
+ON dbo.Users
+AFTER INSERT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    IF ORIGINAL_LOGIN() = 'setup'
+    BEGIN
+        IF EXISTS (
+            SELECT 1
+            FROM inserted
+            WHERE Role <> 'user'
+        )
+        BEGIN
+            RAISERROR('User "setup" can only insert records with Role = ''user''.', 16, 1);
+            ROLLBACK TRANSACTION;
+        END
+    END
+END;
+
+-- UPDATE
+GO
+CREATE TRIGGER trg_LimitUpdateForSetup
+ON dbo.Users
+AFTER UPDATE
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    IF ORIGINAL_LOGIN() = 'users_php'
+    BEGIN
+        IF EXISTS (
+            SELECT 1
+            FROM inserted i
+            JOIN deleted d ON i.user_id = d.user_id
+            WHERE 
+                ISNULL(i.Role, '') <> ISNULL(d.Role, '') OR
+                ISNULL(i.user_id, 0) <> ISNULL(d.user_id, 0) OR
+                ISNULL(i.Is_Verified, 0) <> ISNULL(d.Is_Verified, 0)
+        )
+        BEGIN
+            RAISERROR('User "setup" is not allowed to update Role, Id, or Is_Verified fields.', 16, 1);
+            ROLLBACK TRANSACTION;
+        END
+    END
+END;
+
+
+-- CREATE MASTER KEY
+CREATE MASTER KEY ENCRYPTION BY PASSWORD = 'Pa$$W0rd';
+
+-- Create Certificate
+CREATE CERTIFICATE DataEncryptionCert
+    WITH SUBJECT = 'Data Encryption Certificate';
+
+DECLARE @EncryptedCardNumber VARBINARY(MAX);
+
+-- add new col
+ALTER TABLE cards
+ADD card_number_encrypted VARBINARY(MAX);
+
+-- original db is using card_number
+UPDATE cards
+SET card_number_encrypted = EncryptByCert(Cert_ID('DataEncryptionCert'), card_number);
+
+-- drop original table
+ALTER TABLE cards DROP COLUMN card_number;
+
+-- mask user
+ALTER TABLE users
+ALTER COLUMN password ADD MASKED WITH (FUNCTION = 'default()');
+
+
+--grant access for users
+USE dbcs;
+GRANT SELECT,UPDATE,INSERT ON dbo.users TO users_php;
+GRANT SELECT, INSERT, UPDATE, DELETE ON dbo.Cart TO users_php;
+GRANT SELECT,UPDATE,INSERT ON dbo.Cards TO users_php;
+GRANT SELECT,INSERT ON dbo.payment TO users_php;
+GRANT SELECT,INSERT ON dbo.transactions TO users_php;
+GRANT SELECT ON dbo.products TO users_php;
+revert;
+-- allow users_php use certificate
+GRANT CONTROL ON CERTIFICATE::DataEncryptionCert TO users_php;
