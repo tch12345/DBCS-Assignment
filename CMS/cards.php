@@ -31,7 +31,7 @@ require "Required/Header.php";
                   </thead>
                   <tbody>
                     <?php
-                    $query = "SELECT c.*,u.name FROM cards c JOIN users u ON c.user_id = u.user_id WHERE u.role = 'user';";
+                    $query = "SELECT c.*,'**** **** **** ' + RIGHT(CONVERT(varchar, DecryptByCert(Cert_ID('DataEncryptionCert'), card_number_encrypted)), 4)  AS card_number,u.name FROM cards c JOIN users u ON c.user_id = u.user_id WHERE u.role = 'user';";
                     $stmt = sqlsrv_query($conn, $query);
                     if($stmt){
                       while($data=sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)){

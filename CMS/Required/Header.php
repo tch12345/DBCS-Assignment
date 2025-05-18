@@ -27,7 +27,7 @@
   <aside class="sidenav navbar navbar-vertical active navbar-expand-xs border-radius-lg fixed-start ms-2 my-2 bg-transparent" data-class = "bg-transparent" id="sidenav-main">
     <div class="sidenav-header">
       <i class="fas fa-times p-3 cursor-pointer text-white opacity-5 position-absolute end-0 top-0 d-none d-xl-none" aria-hidden="true" id="iconSidenav"></i>
-      <a class="navbar-brand px-4 py-3 m-0" href="#" target="_blank">
+      <a class="navbar-brand px-4 py-3 m-0" >
         <img src="Image/logo.png" class="navbar-brand-img" width="26" height="26" alt="main_logo">
         <span class="ms-1 text-sm text-white"><?php echo $_SESSION['name']?></span>
       </a>
@@ -51,6 +51,12 @@
           <a class="nav-link <?php echo ($page_name=="Cards"?"active bg-gradient-dark":"")?> text-white" href="cards.php">
             <i class="material-symbols-rounded opacity-5">credit_card</i>
             <span class="nav-link-text ms-1">Cards</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link <?php echo ($page_name=="Product"?"active bg-gradient-dark":"")?> text-white" href="productDash.php">
+            <i class="material-symbols-rounded opacity-5">phone_iphone</i>
+            <span class="nav-link-text ms-1">Products</span>
           </a>
         </li>
         <li class="nav-item">

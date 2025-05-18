@@ -34,20 +34,31 @@ if($_SERVER['REQUEST_METHOD']=='POST' && isset($_POST['submit'])){
       $user_id=$data['user_id'];
     }
     // get user id ady
-    $cards=$_POST['card_number'];
-    $sql="select * from cards where card_number = ? and valid = 1 and user_id = ? ";
+    $cards = trim($_POST['card_number']);
+    
+   
+    $sql = "
+    SELECT *
+    FROM cards 
+    WHERE CONVERT(VARCHAR(50), DecryptByCert(Cert_ID('DataEncryptionCert'), card_number_encrypted))  = ? 
+    AND valid = 1 
+    AND user_id = ?
+    ";
+    
     $params=array(
        $cards,
        $user_id
     );
    
     $stmt = sqlsrv_query($conn, $sql, $params);
+
     if(sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)){
       #got card ignore direct do payment
-
+    
     }else{
       # no card
       //process date
+         
       $updatecard="update cards set valid=0 where user_id=".$user_id;
       sqlsrv_query($conn,  $updatecard);
       
@@ -70,16 +81,35 @@ if($_SERVER['REQUEST_METHOD']=='POST' && isset($_POST['submit'])){
         }
       $json_string = json_encode($address_array, JSON_UNESCAPED_UNICODE);
     
+     
 
-      $insertsql="INSERT INTO cards (user_id, card_number, card_brand, expiration_date, billing_address,created_at) VALUES (?, ?, ?, ?, ?,GETDATE())";
-      $param=array(
+    $insertsql = "INSERT INTO cards (
+                    user_id, 
+                    card_number_encrypted, 
+                    card_brand, 
+                    expiration_date, 
+                    billing_address, 
+                    created_at
+                )
+                VALUES (
+                    ?, 
+                    EncryptByCert(Cert_ID('DataEncryptionCert'),'".$cards."'), 
+                    ?, 
+                    ?, 
+                    ?, 
+                    GETDATE()
+                );";
+
+       
+      $param=[
         $user_id,
-        $cards,
         getCardBrand($cards),
         $lastDay,
         $json_string
-      );
-      $stmt = sqlsrv_query($conn, $insertsql, $param);
+      ];
+      
+      $stmt = sqlsrv_prepare($conn, $insertsql, $param);
+      sqlsrv_execute($stmt);
     }
     // make payment here got card ady
     $selectCart = "SELECT product_name, quantity FROM cart WHERE user_id = ? and deleted_at is null";
@@ -111,6 +141,7 @@ if($_SERVER['REQUEST_METHOD']=='POST' && isset($_POST['submit'])){
         $total_price
       );
       $insertStmt = sqlsrv_query($conn, $insertPayment, $params);
+
       $deleteCart = "DELETE FROM cart WHERE user_id = ? AND deleted_at IS NULL";
       $deleteStmt = sqlsrv_query($conn, $deleteCart,array($_SESSION['customer_id']));
       
@@ -151,7 +182,7 @@ $total=0;
 while ($row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)) {
                 $total+=$row['price']*$row['quantity'];
 }
-$sql = "SELECT c.*,u.name, u.email ,u.phone FROM cards c
+$sql = "SELECT c.*,u.name, u.email ,u.phone,CONVERT(VARCHAR(50), DecryptByCert(Cert_ID('DataEncryptionCert'), c.card_number_encrypted)) AS decrypted_card_number FROM cards c
 LEFT JOIN users u ON c.user_id = u.user_id
  WHERE CONVERT(VARCHAR(32), HASHBYTES('MD5', CAST(c.user_id AS VARCHAR)), 2) = ? and valid=1";
 
@@ -206,7 +237,7 @@ require "Required/header.php";
 
           <div class="mb-3">
             <label for="cardNumber" class="form-label">Card Number</label>
-            <input type="text" class="form-control" id="cardNumber" <?php if ($card) echo 'value="' . htmlspecialchars($card['card_number']) . '"'; ?> name="card_number" maxlength="19" required>
+            <input type="text" class="form-control" id="cardNumber" <?php if ($card) echo 'value="' .$card['decrypted_card_number'].'"'; ?> name="card_number" maxlength="19" required>
           </div>
 
           <div class="row">

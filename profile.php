@@ -48,9 +48,11 @@ require "Required/header.php";
           </div>
           <?php
             $sql_card= "SELECT 
-                    billing_address,card_brand,RIGHT(card_number, 4) AS last4digits
-                FROM cards
-                WHERE CONVERT(VARCHAR(32), HASHBYTES('MD5', CAST(user_id AS VARCHAR)), 2) = ?;";
+                          billing_address,
+                          card_brand,
+                          RIGHT(CONVERT(VARCHAR(50), DecryptByCert(Cert_ID('DataEncryptionCert'), card_number_encrypted)), 4) AS last4digits
+                      FROM cards
+                      WHERE CONVERT(VARCHAR(32), HASHBYTES('MD5', CAST(user_id AS VARCHAR)), 2) = ? and valid=1;";
               $array=array(
                 $_SESSION['customer_id']
               );
