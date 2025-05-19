@@ -38,11 +38,11 @@ GO
 --Constraint INSERT FOR user_php 
 CREATE TRIGGER trg_LimitInsertRoleForSetup
 ON dbo.Users
+WITH EXECUTE AS OWNER
 AFTER INSERT
 AS
 BEGIN
     SET NOCOUNT ON;
-
     IF ORIGINAL_LOGIN() = 'users_php'
     BEGIN
         IF EXISTS (
@@ -61,6 +61,7 @@ END;
 GO
 CREATE TRIGGER trg_LimitUpdateForSetup
 ON dbo.Users
+WITH EXECUTE AS OWNER
 AFTER UPDATE
 AS
 BEGIN
