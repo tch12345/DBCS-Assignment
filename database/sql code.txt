@@ -121,3 +121,25 @@ GRANT SELECT ON dbo.products TO users_php;
 revert;
 -- allow users_php use certificate
 GRANT CONTROL ON CERTIFICATE::DataEncryptionCert TO users_php;
+
+
+--audit
+CREATE SERVER AUDIT Audit_LoginEvents
+TO FILE (
+    FILEPATH = 'C:\AuditLogs\',   -- Make sure this folder exists and SQL Server has write permission
+    MAXSIZE = 100 MB,
+    MAX_FILES = 100,
+    RESERVE_DISK_SPACE = OFF
+)
+WITH (
+    QUEUE_DELAY = 1000,  -- 1 second delay
+    ON_FAILURE = CONTINUE
+);
+
+CREATE SERVER AUDIT SPECIFICATION Audit_Logins_Spec
+FOR SERVER AUDIT Audit_LoginEvents
+ADD (SUCCESSFUL_LOGIN_GROUP),
+ADD (FAILED_LOGIN_GROUP);
+
+ALTER SERVER AUDIT Audit_LoginEvents WITH (STATE = ON);
+ALTER SERVER AUDIT SPECIFICATION Audit_Logins_Spec WITH (STATE = ON);
