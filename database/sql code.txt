@@ -43,7 +43,7 @@ AS
 BEGIN
     SET NOCOUNT ON;
 
-    IF ORIGINAL_LOGIN() = 'setup'
+    IF ORIGINAL_LOGIN() = 'users_php'
     BEGIN
         IF EXISTS (
             SELECT 1
