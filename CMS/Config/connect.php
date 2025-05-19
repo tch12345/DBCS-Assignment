@@ -6,7 +6,7 @@ $connectionOptions = [
     "UID" => "admin",
     "PWD" => 'Pa$$W0rd'
 ];
-
+#current user is admin
 $conn = sqlsrv_connect($serverName, $connectionOptions);
 
 

@@ -25,8 +25,16 @@ if(($_SERVER['REQUEST_METHOD'] == 'POST') && isset($_POST['update'])){
     sqlsrv_execute($stmt);
     $data = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC);
     
-    if($currentPassword != $data['password']){
-      $script .= "swal.error('Password Incorrect','Please Check it')";
+    $checkpassword="SELECT * FROM users WHERE CONVERT(VARCHAR(32), HASHBYTES('MD5', CAST(user_id AS VARCHAR)), 2) = ? and password=?";
+     $array2=array(
+      $_SESSION['customer_id'],
+      $currentPassword
+    );
+    $stmt2 = sqlsrv_prepare($conn, $checkpassword, $array2);
+    sqlsrv_execute($stmt2);
+    sqlsrv_fetch($stmt2);
+    if(!sqlsrv_has_rows($stmt2)){
+      $script .= "swal.fail('Password Incorrect','Please Check it')";
     }else{
 
    
