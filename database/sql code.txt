@@ -144,3 +144,12 @@ ADD (FAILED_LOGIN_GROUP);
 
 ALTER SERVER AUDIT Audit_LoginEvents WITH (STATE = ON);
 ALTER SERVER AUDIT SPECIFICATION Audit_Logins_Spec WITH (STATE = ON);
+
+
+--backup
+BACKUP DATABASE [dbcs]
+TO DISK = 'C:\Backup\dbcs.bak'
+WITH FORMAT,
+     MEDIANAME = 'DbBackup',
+     NAME = 'Full Backup of dbcs';
+-- set the timing in the job
