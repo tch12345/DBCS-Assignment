@@ -152,4 +152,5 @@ TO DISK = 'C:\Backup\dbcs.bak'
 WITH FORMAT,
      MEDIANAME = 'DbBackup',
      NAME = 'Full Backup of dbcs';
+--put this in job when creating new job
 -- set the timing in the job
